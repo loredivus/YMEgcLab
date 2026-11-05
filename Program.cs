@@ -1,4 +1,5 @@
-﻿using Egc;
+﻿//maksym.yatsko@student.usv.ro
+using Egc;
 
 // Program.cs conține DOAR inițializarea aplicației:
 // creăm fereastra (clasa Game) și pornim bucla principală.
