@@ -4,7 +4,7 @@ namespace Egc;
 
 /// <summary>
 /// O formă geometrică desenată în stilul OpenGL modern: date în VBO, indici în EBO,
-/// descrierea formatului în VAO. Neschimbată față de laboratorul 4, cu o singură excepție:
+/// descrierea formatului în VAO. Neschimbată față de laboratorul 5. Față de laboratorul 4 are în plus
 /// proprietatea TriangleCount (afișată în consolă, tasta I).
 /// Formatul unui vârf NU s-a schimbat: 6 float = x, y, z, r, g, b.
 /// </summary>

@@ -4,7 +4,7 @@ using OpenTK.Mathematics;
 namespace Egc;
 
 /// <summary>
-/// Fabrica de forme 3D: fiecare metodă calculează vârfurile și indicii unei forme (mesh procedural)
+/// Fabrica de forme 3D (completă, rezolvată în laboratorul 5): fiecare metodă calculează vârfurile și indicii unei forme (mesh procedural)
 /// și construiește un obiect Mesh. Un vârf = 6 float: x, y, z, r, g, b (ca în laboratoarele 2–4).
 /// Formele sunt descrise în object space, cu centrul în origine; locul, mărimea și rotația
 /// din scenă sunt date de matricea model (Transform3D).
@@ -125,28 +125,28 @@ public static class Shapes
                 new Vector3(h, -h, h), new Vector3(h, -h, -h), new Vector3(h, h, -h), new Vector3(h, h, h),
                 new Color4(1.0f, 0.2f, 0.2f, 1.0f));
 
-        // TODO 5.3: fețele 2..5. Pentru fiecare față, imaginați-vă că o priviți din afara cubului
+        // Fețele 2..5 (laboratorul 5). Pentru fiecare față, imaginați-vă că o priviți din afara cubului
         //           și stabiliți direcțiile "dreapta" și "sus" (ca în comentariile de mai sus).
 
-        // Fata 2: -Z (spate). Privita din +Z: dreapta = -X, sus = +Y.
+        // Fața 2: -Z (spate). Privită din -Z: dreapta = -X, sus = +Y.
         AddFace(vertices, indices, 2,
                 new Vector3(h, -h, -h), new Vector3(-h, -h, -h), new Vector3(-h, h, -h), new Vector3(h, h, -h),
-                new Color4(1.0f, 1.0f, 0.2f, 1.0f));
+                new Color4(1.0f, 0.9f, 0.2f, 1.0f));
 
-        // Fata 3: -X (stanga). Privita din +X: dreapta = +Z, sus = +Y.
+        // Fața 3: -X (stânga). Privită din -X: dreapta = +Z, sus = +Y.
         AddFace(vertices, indices, 3,
                 new Vector3(-h, -h, -h), new Vector3(-h, -h, h), new Vector3(-h, h, h), new Vector3(-h, h, -h),
-                new Color4(0.2f, 1.0f, 1.0f, 1.0f));
+                new Color4(0.2f, 0.9f, 0.9f, 1.0f));
 
-        // Fata 4: +Y (sus). Privita din +Y: dreapta = +X, sus = -Z.
+        // Fața 4: +Y (sus). Privită de deasupra: dreapta = +X, sus = -Z.
         AddFace(vertices, indices, 4,
-                new Vector3(-h, h, -h), new Vector3(-h, h, h), new Vector3(h, h, h), new Vector3(h, h, -h),
-                new Color4(0.2f, 1.0f, 0.2f, 1.0f));
+                new Vector3(-h, h, h), new Vector3(h, h, h), new Vector3(h, h, -h), new Vector3(-h, h, -h),
+                new Color4(0.3f, 0.9f, 0.3f, 1.0f));
 
-        // Fata 5: -Y (jos). Privita din -Y: dreapta = -X, sus = +Z.
+        // Fața 5: -Y (jos). Privită de dedesubt: dreapta = +X, sus = +Z.
         AddFace(vertices, indices, 5,
-                new Vector3(h, -h, -h), new Vector3(h, -h, h), new Vector3(-h, -h, h), new Vector3(-h, -h, -h),
-                new Color4(1.0f, 0.2f, 1.0f, 1.0f));
+                new Vector3(-h, -h, -h), new Vector3(h, -h, -h), new Vector3(h, -h, h), new Vector3(-h, -h, h),
+                new Color4(0.9f, 0.3f, 0.9f, 1.0f));
 
         return new Mesh(vertices, indices);
     }
@@ -175,12 +175,12 @@ public static class Shapes
             {
                 float u = (float)j / slices;                      // 0 .. 1 în jurul sferei
                 float longitude = u * 2.0f * MathF.PI;            // 0° .. 360°
-                float r_p = radius * (float)MathHelper.Cos(latitude);
 
-                // TODO 5.4 (a): poziția vârfului (coordonate sferice -> carteziene, secțiunea 2.2)
-                float x = r_p * (float)MathHelper.Cos(longitude);
-                float y = radius * (float)MathHelper.Sin(latitude);
-                float z = -r_p * (float)MathHelper.Sin(longitude);
+                // poziția vârfului (coordonate sferice -> carteziene)
+                float ring = radius * MathF.Cos(latitude);        // raza paralelei pe care se află vârful
+                float x = ring * MathF.Cos(longitude);
+                float y = radius * MathF.Sin(latitude);
+                float z = -ring * MathF.Sin(longitude);
 
                 SetVertex(vertices, i * columns + j, x, y, z, u, v, 0.35f);
             }
@@ -197,11 +197,11 @@ public static class Shapes
                 uint topLeft = bottomLeft + (uint)columns;
                 uint topRight = topLeft + 1;
 
-                // TODO 5.4 (b): cele două triunghiuri ale celulei, în sens trigonometric privite din afară
-                //               (6 indici: indices[k++] = ...)
+                // cele două triunghiuri ale celulei, în sens trigonometric privite din afară
                 indices[k++] = bottomLeft;
                 indices[k++] = bottomRight;
                 indices[k++] = topRight;
+
                 indices[k++] = topRight;
                 indices[k++] = topLeft;
                 indices[k++] = bottomLeft;
@@ -212,14 +212,110 @@ public static class Shapes
     }
 
     /// <summary>
-    /// FACULTATIV (TODO 5.8): cilindrul cu axa pe Y, de rază <paramref name="radius"/> și înălțime
+    /// Cilindrul cu axa pe Y, de rază <paramref name="radius"/> și înălțime
     /// <paramref name="height"/>, cu <paramref name="segments"/> segmente pe circumferință.
     /// Suprafața laterală = o grilă cu 2 rânduri (ca sfera, cu un singur "stack"); capacele = evantaie.
     /// </summary>
     public static Mesh Cylinder(float radius, float height, int segments)
     {
-        // TODO 5.8 (facultativ): vârfurile și indicii cilindrului; până atunci, o formă goală.
-        return new Mesh(Array.Empty<float>(), Array.Empty<uint>());
+        int columns = segments + 1;
+        // vârfuri: lateral 2 × columns, capac sus 1 + segments, capac jos 1 + segments
+        int vertexCount = 2 * columns + 2 * (segments + 1);
+        var vertices = new float[vertexCount * Mesh.FloatsPerVertex];
+        var indices = new uint[segments * 6 + 2 * segments * 3];
+        float half = height / 2.0f;
+
+        // Suprafața laterală: rândul 0 jos, rândul 1 sus; culoarea = nuanța după unghi.
+        for (int j = 0; j < columns; j++)
+        {
+            float u = (float)j / segments;
+            float angle = u * 2.0f * MathF.PI;
+            float x = radius * MathF.Cos(angle);
+            float z = -radius * MathF.Sin(angle);
+            Color4 color = ColorUtil.FromHsv(u, 0.7f, 1.0f);
+            SetVertex(vertices, j, x, -half, z, color);
+            SetVertex(vertices, columns + j, x, half, z, color);
+        }
+
+        int k = 0;
+        for (int j = 0; j < segments; j++)
+        {
+            uint bl = (uint)j, br = bl + 1, tl = (uint)(columns + j), tr = tl + 1;
+            indices[k++] = bl; indices[k++] = br; indices[k++] = tr;
+            indices[k++] = tr; indices[k++] = tl; indices[k++] = bl;
+        }
+
+        // Capacele: centrul + colțurile, ca poligonul regulat din laboratorul 3.
+        int top = 2 * columns;
+        int bottom = top + segments + 1;
+        Color4 topColor = new(0.9f, 0.9f, 0.9f, 1.0f), bottomColor = new(0.4f, 0.4f, 0.4f, 1.0f);
+        SetVertex(vertices, top, 0, half, 0, topColor);
+        SetVertex(vertices, bottom, 0, -half, 0, bottomColor);
+        for (int j = 0; j < segments; j++)
+        {
+            float angle = 2.0f * MathF.PI * j / segments;
+            float x = radius * MathF.Cos(angle);
+            float z = -radius * MathF.Sin(angle);
+            SetVertex(vertices, top + 1 + j, x, half, z, topColor);
+            SetVertex(vertices, bottom + 1 + j, x, -half, z, bottomColor);
+        }
+        for (int j = 0; j < segments; j++)
+        {
+            uint a = (uint)(1 + j), b = (uint)(1 + (j + 1) % segments);
+            // sus: privit de deasupra, unghiul crește în sens trigonometric
+            indices[k++] = (uint)top; indices[k++] = (uint)top + a; indices[k++] = (uint)top + b;
+            // jos: privit de dedesubt, sensul se inversează
+            indices[k++] = (uint)bottom; indices[k++] = (uint)bottom + b; indices[k++] = (uint)bottom + a;
+        }
+
+        return new Mesh(vertices, indices);
+    }
+
+    // =====================================================================================
+    // NOU (laboratorul 6): forme "albe", umbrite simplu, pentru obiectele colorate prin nuanță (Tint)
+    // =====================================================================================
+    // Nu avem încă iluminare (vine într-un laborator viitor). Ca obiectele să nu arate "plate",
+    // fiecare vârf primește un gri care depinde de orientarea suprafeței față de o lumină fixă,
+    // venită de sus și din față. Culoarea propriu-zisă se dă prin SceneObject.Tint.
+
+    /// <summary>Cubul cu latura 1, gri umbrit (fața de sus cea mai luminoasă).</summary>
+    public static Mesh ShadedCube()
+    {
+        Vector3[] faceNormals = { Vector3.UnitZ, Vector3.UnitX, -Vector3.UnitZ, -Vector3.UnitX, Vector3.UnitY, -Vector3.UnitY };
+        return Recolor(Cube(), (vertex, _) => faceNormals[vertex / 4]);
+    }
+
+    /// <summary>Sfera de rază <paramref name="radius"/>, gri umbrit.</summary>
+    public static Mesh ShadedSphere(float radius, int slices, int stacks) =>
+        Recolor(Sphere(radius, slices, stacks), (_, position) => position.Normalized());
+
+    /// <summary>Cilindrul cu axa pe Y, gri umbrit.</summary>
+    public static Mesh ShadedCylinder(float radius, float height, int segments)
+    {
+        int lateral = 2 * (segments + 1);       // vârfurile suprafeței laterale (vezi Cylinder)
+        int top = lateral;                      // primul vârf al capacului de sus
+        int bottom = top + segments + 1;        // primul vârf al capacului de jos
+        return Recolor(Cylinder(radius, height, segments), (vertex, position) =>
+            vertex < lateral ? new Vector3(position.X, 0, position.Z).Normalized()
+          : vertex < bottom ? Vector3.UnitY
+          : -Vector3.UnitY);
+    }
+
+    private static readonly Vector3 LightDirection = new Vector3(0.4f, 1.0f, 0.6f).Normalized();
+
+    /// <summary>Înlocuiește culoarea fiecărui vârf cu un gri: 0.45 (în umbră) .. 1.0 (spre lumină).</summary>
+    private static Mesh Recolor(Mesh mesh, Func<int, Vector3, Vector3> normalOf)
+    {
+        for (int vertex = 0; vertex < mesh.VertexCount; vertex++)
+        {
+            int i = vertex * Mesh.FloatsPerVertex;
+            var position = new Vector3(mesh.Vertices[i], mesh.Vertices[i + 1], mesh.Vertices[i + 2]);
+            float light = MathF.Max(0.0f, Vector3.Dot(normalOf(vertex, position), LightDirection));
+            float gray = 0.45f + 0.55f * light;
+            mesh.SetColor(vertex, gray, gray, gray);
+        }
+        mesh.UpdateVertices();   // datele noi trebuie copiate în VBO
+        return mesh;
     }
 
     // =====================================================================================

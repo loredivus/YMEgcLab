@@ -48,7 +48,7 @@ public abstract class Camera
         get
         {
             // TODO 5.1 (b): hFOV = 2 · atan( tan(vFOV / 2) · aspect ); atenție la grade / radiani
-            return 2 * (float)MathHelper.Atan(MathHelper.Tan(FieldOfView/2.0f) * AspectRatio);
+            return 2 * (float)MathHelper.Atan(MathHelper.Tan(MathHelper.DegreesToRadians(FieldOfView)/2) * AspectRatio);
         }
     }
 
