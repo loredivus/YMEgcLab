@@ -4,16 +4,13 @@ using System.Text;
 namespace Egc;
 
 /// <summary>
-/// Afișarea în fereastra consolă: meniul de taste (H) și parametrii scenei (I).
-/// Consola nu se reîmprospătează continuu: textul se scrie doar la cerere sau la schimbarea
-/// modului camerei, ca să poată fi citit.
+/// Afișarea în fereastra consolă: meniul de comenzi (H) și parametrii scenei (I).
+/// Față de laboratorul 5, meniul nu mai este scris de mână: îl generează Input din legăturile
+/// acțiunilor, deci rămâne corect și după ce schimbați tastele.
 /// </summary>
 public static class ConsolePanel
 {
-    /// <summary>
-    /// Pregătește consola: UTF-8 (pentru diacritice) și punctul ca separator zecimal
-    /// (altfel, cu setările românești, "(1,70, 6,00)" s-ar confunda cu separatorul dintre coordonate).
-    /// </summary>
+    /// <summary>Pregătește consola: UTF-8 (pentru diacritice) și punctul ca separator zecimal.</summary>
     public static void Init()
     {
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
@@ -27,26 +24,14 @@ public static class ConsolePanel
         }
     }
 
-    public static void PrintHelp()
+    public static void PrintHelp(string title, IEnumerable<string> common, IEnumerable<string> scene)
     {
         Console.WriteLine();
-        Console.WriteLine("=============== EGC – Laborator 05: comenzi ===============");
-        Console.WriteLine(" Mouse          privire în jur (camera FPS; cursorul este captiv)");
-        Console.WriteLine(" W A S D        deplasare (Shift = mai repede)");
-        Console.WriteLine(" Space / Ctrl   sus / jos (doar în zbor liber)");
-        Console.WriteLine(" Rotița         FOV (camera FPS) / distanța (camera orbită)");
-        Console.WriteLine(" G              mers <-> zbor liber (FPS)");
-        Console.WriteLine(" V              camera FPS <-> camera orbită (tema)");
-        Console.WriteLine(" M              eliberează / capturează cursorul");
-        Console.WriteLine(" Z              testul de adâncime (depth test) pornit / oprit");
-        Console.WriteLine(" C              eliminarea fețelor din spate (face culling) pornit / oprit");
-        Console.WriteLine(" F              contur (wireframe) / plin");
-        Console.WriteLine(" L              VSync (limitarea cadrelor/secundă) pornit / oprit");
-        Console.WriteLine(" R              camera revine în poziția inițială");
-        Console.WriteLine(" I              parametrii scenei în consolă");
-        Console.WriteLine(" H              acest meniu");
-        Console.WriteLine(" Esc            ieșire");
-        Console.WriteLine("============================================================");
+        Console.WriteLine($"=============== {title}: comenzi ===============");
+        foreach (string line in common) Console.WriteLine(" " + line);
+        Console.WriteLine(" ---- scena curentă ----");
+        foreach (string line in scene) Console.WriteLine(" " + line);
+        Console.WriteLine("=================================================================");
     }
 
     public static void PrintInfo(IEnumerable<string> lines)
